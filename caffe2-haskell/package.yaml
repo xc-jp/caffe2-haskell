@@ -1,0 +1,151 @@
+name:                caffe2-haskell
+version:             0.1.0.0
+#synopsis:
+#description:
+homepage:            https://github.com/githubuser/caffe2#readme
+license:             BSD3
+author:              XCompass, Ltd.
+maintainer:          ix-dev@xcompass.com
+copyright:           © 2018 Xcompass, Ltd.
+category:            Machine Learning
+
+extra-source-files:
+  - README.md
+
+dependencies:
+  - accelerate
+  - accelerate-io
+  - aeson
+  - async
+  - base
+  - binary
+  - bytestring
+  - caffe2-proto
+  - classy-prelude
+  - constraints
+  - containers
+  - data-default
+  - deepseq
+  - directory
+  - filepath
+  - inline-c
+  - inline-c-cpp
+  - ix-base
+  - lens
+  - lens-aeson
+  - mono-traversable
+  - mtl
+  - process
+  - proto-lens
+  - random
+  - safe
+  - singletons
+  - split
+  - stm
+  - streams
+  - template-haskell
+  - text
+  - time
+  - transformers
+  - unix
+  - unordered-containers
+  - vector
+
+default-extensions:
+  - AutoDeriveTypeable
+  - BangPatterns
+  - BinaryLiterals
+  - ConstraintKinds
+  - DataKinds
+  - DefaultSignatures
+  - DeriveDataTypeable
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveTraversable
+  - DerivingStrategies
+  - DoAndIfThenElse
+  - EmptyDataDecls
+  - ExistentialQuantification
+  - FlexibleContexts
+  - FlexibleInstances
+  - FunctionalDependencies
+  - GADTs
+  - GeneralizedNewtypeDeriving
+  - InstanceSigs
+  - KindSignatures
+  - LambdaCase
+  - MultiParamTypeClasses
+  - MultiWayIf
+  - NamedFieldPuns
+  - NoImplicitPrelude
+  - OverloadedStrings
+  - PartialTypeSignatures
+  - PatternGuards
+  - PolyKinds
+  - RankNTypes
+  - RecordWildCards
+  - ScopedTypeVariables
+  - StandaloneDeriving
+  - TupleSections
+  - TypeApplications
+  - TypeFamilies
+  - TypeOperators
+  - TypeSynonymInstances
+  - ViewPatterns
+
+ghc-options:
+  - -Wall
+  - -Wcompat
+  - -Werror
+  - -Wincomplete-record-updates
+  - -Wincomplete-uni-patterns
+  - -Wnoncanonical-monad-instances
+  - -Wnoncanonical-monadfail-instances
+
+library:
+  when:
+    - condition: os(darwin)
+      ghc-options:
+        - -optc-std=c++11
+    - condition: flag(use-gpu)
+      source-dirs: gpu
+      extra-libraries:
+        - c10
+        - caffe2
+        - caffe2_gpu
+        - curand
+        - cudart
+      exposed-modules:
+        - Foreign.Caffe2
+    - condition: "!flag(use-gpu)"
+      source-dirs: cpu
+      extra-libraries:
+        - c10
+        - caffe2
+      exposed-modules:
+        - Foreign.Caffe2
+  extra-libraries:
+    - stdc++
+  pkg-config-dependencies:
+    - gflags
+    - libglog
+    - protobuf
+tests:
+  tasty:
+    source-dirs:      test/tasty
+    main:             tasty.hs
+    dependencies:
+      - QuickCheck
+      - caffe2-haskell
+      - tasty
+      - tasty-quickcheck
+      - tasty-hunit
+    ghc-options:
+    - -Wno-missing-signatures
+
+flags:
+  use-gpu:
+    description: Run Caffe2 computations on the GPU
+    manual: true
+    default: false
