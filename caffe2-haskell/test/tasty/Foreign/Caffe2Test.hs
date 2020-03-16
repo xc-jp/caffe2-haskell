@@ -2,11 +2,9 @@ module Foreign.Caffe2Test(tests) where
 
 import ClassyPrelude
 
-import Data.Array.Accelerate ((:.) (..), Z (..))
+import qualified Data.Vector.Storable as Vector
 import Foreign.Caffe2
-import IX.Data.Elt
-import IX.Data.ShapeElt
-import IX.Data.Tensor
+import Foreign.Caffe2.Caffe2Elt
 import Test.Tasty
 import Test.Tasty.HUnit (testCase, (@?=))
 
@@ -15,12 +13,23 @@ tests =
   testGroup
     "Foreign.Caffe2"
     [ testReadAfterInput
+    , testGetShape
     ]
 
 testReadAfterInput :: TestTree
-testReadAfterInput = testCase "readTensor . inputTensor" $ do
-  let tensor = mkTensorSh (Z :. 2) [1, 2] :: Tensor (Z :. Int) Float
+testReadAfterInput = testCase "readBlob . writeBlob === identity" $ do
+  let tensor = Vector.fromList [1, 2]
   ws <- initWorkspace
-  inputTensor ws "tensor" tensor
-  tensor' <- readTensor ws (ShapeElt (Z :. 2) SEltTypeFloat) "tensor"
+  blob <- createBlob ws "tensor"
+  writeBlob [2] Caffe2Float tensor blob
+  tensor' <- readBlob 2 Caffe2Float blob
   tensor' @?= tensor
+
+testGetShape :: TestTree
+testGetShape = testCase "get shape of written blob" $ do
+  let tensor = Vector.fromList [1..6]
+  ws <- initWorkspace
+  blob <- createBlob ws "tensor"
+  writeBlob [2,3] Caffe2Float tensor blob
+  dims <- getShape blob
+  dims @?= [2,3]

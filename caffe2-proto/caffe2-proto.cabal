@@ -1,17 +1,17 @@
 cabal-version: 2.0
 
--- This file has been generated from package.yaml by hpack version 0.31.2.
---
--- see: https://github.com/sol/hpack
---
--- hash: 33a21801ac8220c4f5ea84270b640e461c95148d92298331cc6ce79b2c9df26b
-
 name:           caffe2-proto
 version:        0.1.0.0
+category:       Machine Learning
+homepage:       https://github.com/xc-jp/greenia#readme
+author:         Cross Compass, Ltd.
+maintainer:     ix-dev@cross-compass.com
+copyright:      © 2018 Cross Compass, Ltd.
 license:        BSD3
 license-file:   LICENSE
 build-type:     Custom
 extra-source-files:
+    CHANGELOG.md
     proto/caffe2.proto
 
 custom-setup
@@ -27,6 +27,7 @@ library
   other-modules:
       Paths_caffe2_proto
   autogen-modules:
+      Paths_caffe2_proto
       Proto.Caffe2
       Proto.Caffe2_Fields
   ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
