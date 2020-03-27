@@ -1,10 +1,6 @@
-# This derivation can be used to create an nix-shell environment for developing
-# the Greenia Haskell packages.
-#
-# This derivation is used from the `stack` wrapper in the `tools` directory.
-
 { withHoogle ? false
 , nixpkgs ? builtins.fetchTarball https://github.com/NixOS/nixpkgs/archive/e6deb2955c2b04c02a9bfb92a19cc027b2271b90.tar.gz
+, cudaSupport ? false
 }@args:
 
 let
@@ -15,16 +11,6 @@ let
     };
   pkgs = import nixpkgs {};
 
-  # We need an older version (< 2.1) of stack due to issue:
-  # https://github.com/commercialhaskell/stack/issues/5000
-  inherit (pkgs) writeScriptBin;
-
-  # Stack needs the security binary to be available in the environment to do
-  # TLS on macOS
-  securityWrapper = writeScriptBin "security" ''
-    #!/bin/sh -e
-    exec /usr/bin/security "$@"
-  '';
   caffe2-pytorch = pkgs.callPackage ./caffe2.nix {
     inherit (pkgs.python3Packages) python future six numpy pydot pyyaml;
     # Use python with the standard version of protobuf.
@@ -52,31 +38,7 @@ pkgs.haskell.lib.buildStackProject {
 
   src = ./.;
 
-  # inherit stack;
-
-  buildInputs = with pkgs;
-    [
-      caffe2-pytorch
-      eigen
-      git
-      glog
-      google-gflags
-      libffi
-      # llvm-config
-      postgresql
-      protobuf
-      # hsPkgs.ShellCheck.components.exes.shellcheck
-      # shunit2
-      sqlite
-      zlib
-    ]; # ++
-    # lib.optional stdenv.isDarwin securityWrapper ++
-    # lib.optional cudaSupport cudatoolkit;
+  buildInputs = [ caffe2-pytorch ] ++ pkgs.lib.optional cudaSupport pkgs.cudatoolkit;
 
   inherit withHoogle;
-
-  extraArgs = with pkgs;
-      ["--extra-lib-dirs=${eigen}/lib" 
-       "--extra-include-dirs=${eigen}/include" 
-      ];
 }

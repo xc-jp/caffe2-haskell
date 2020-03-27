@@ -26,16 +26,17 @@ module Foreign.Caffe2
   , getShape
   )
   where
-import ClassyPrelude hiding (Vector)
+import           ClassyPrelude                hiding (Vector)
 
-import qualified Data.Vector.Storable as Vector
+import           Data.Coerce                  (coerce)
+import qualified Data.Vector.Storable         as Vector
 import qualified Data.Vector.Storable.Mutable as Mutable
-import Foreign.C (CInt, CSize)
-import qualified Language.C.Inline.Cpp as C
+import           Foreign.C                    (CInt, CSize)
+import qualified Language.C.Inline.Cpp        as C
 
-import Foreign.Caffe2.Caffe2Elt (Caffe2Elt (..))
-import Foreign.Caffe2.Workspace hiding (createNetwork, initWorkspace,
-                                 runNetOnce)
+import           Foreign.Caffe2.Caffe2Elt     (Caffe2Elt (..))
+import           Foreign.Caffe2.Workspace     hiding (createNetwork,
+                                               initWorkspace, runNetOnce)
 
 C.context (C.cppCtx <> C.funCtx <> C.vecCtx <> C.bsCtx)
 
@@ -88,25 +89,25 @@ readBlob
   -> IO (Vector.Vector e)
 readBlob  size elt (BlobPtr blob) =
   case elt of
-    Caffe2Float  -> fmap (Vector.map realToFrac) $ READ_TENSOR(blob,float)
-    Caffe2Double -> fmap (Vector.map realToFrac) $ READ_TENSOR(blob,double)
-    Caffe2Word8  -> fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,uint8_t)
-    Caffe2Word16 -> fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,uint16_t)
+    Caffe2Float  -> coerce $ READ_TENSOR(blob,float)
+    Caffe2Double -> coerce $ READ_TENSOR(blob,double)
+    Caffe2Word8  -> coerce $ READ_TENSOR(blob,uint8_t)
+    Caffe2Word16 -> coerce $ READ_TENSOR(blob,uint16_t)
     Caffe2Word32 -> do
         sayErr "Warning: Caffe2 doesn't support Word32"
         sayErr "Reading the blob as Int32"
-        fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,int32_t)
+        coerce $ READ_TENSOR(blob,int32_t)
     Caffe2Word64 -> do
         sayErr "Warning: Caffe2 doesn't support Word64"
         sayErr "Reading the blob as Int64"
-        fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,int64_t)
-    Caffe2Int8   -> fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,int8_t)
-    Caffe2Int16  -> fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,int16_t)
-    Caffe2Int32  -> fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,int32_t)
-    Caffe2Int64  -> fmap (Vector.map fromIntegral) $ READ_TENSOR(blob,int64_t)
+        coerce $ READ_TENSOR(blob,int64_t)
+    Caffe2Int8   -> coerce $ READ_TENSOR(blob,int8_t)
+    Caffe2Int16  -> coerce $ READ_TENSOR(blob,int16_t)
+    Caffe2Int32  -> coerce $ READ_TENSOR(blob,int32_t)
+    Caffe2Int64  -> coerce $ READ_TENSOR(blob,int64_t)
     Caffe2Unit   -> pure $ Vector.replicate size ()
   where
-    outputSize = fromIntegral $ size :: CInt
+    outputSize = fromIntegral size :: CInt
 
 #define READ_CPU_TENSOR(BLOB,CTYPE)                                                      \
   Mutable.new (fromIntegral outputSize) >>= \vec ->                                      \
@@ -129,28 +130,28 @@ readCPUBlob
   -> IO (Vector.Vector e)
 readCPUBlob size elt (BlobPtr blob) =
   case elt of
-    Caffe2Float  -> fmap (Vector.map realToFrac) $ READ_CPU_TENSOR(blob,float)
-    Caffe2Double -> fmap (Vector.map realToFrac) $ READ_CPU_TENSOR(blob,double)
-    Caffe2Word8  -> fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,uint8_t)
-    Caffe2Word16 -> fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,uint16_t)
+    Caffe2Float  -> coerce $ READ_CPU_TENSOR(blob,float)
+    Caffe2Double -> coerce $ READ_CPU_TENSOR(blob,double)
+    Caffe2Word8  -> coerce $ READ_CPU_TENSOR(blob,uint8_t)
+    Caffe2Word16 -> coerce $ READ_CPU_TENSOR(blob,uint16_t)
     Caffe2Word32 -> do
         sayErr "Warning: Caffe2 doesn't support Word32"
         sayErr "Reading the blob as Int32"
-        fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,int32_t)
+        coerce $ READ_CPU_TENSOR(blob,int32_t)
     Caffe2Word64 -> do
         sayErr "Warning: Caffe2 doesn't support Word64"
         sayErr "Reading the blob as Int64"
-        fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,int64_t)
-    Caffe2Int8   -> fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,int8_t)
-    Caffe2Int16  -> fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,int16_t)
-    Caffe2Int32  -> fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,int32_t)
-    Caffe2Int64  -> fmap (Vector.map fromIntegral) $ READ_CPU_TENSOR(blob,int64_t)
+        coerce $ READ_CPU_TENSOR(blob,int64_t)
+    Caffe2Int8   -> coerce $ READ_CPU_TENSOR(blob,int8_t)
+    Caffe2Int16  -> coerce $ READ_CPU_TENSOR(blob,int16_t)
+    Caffe2Int32  -> coerce $ READ_CPU_TENSOR(blob,int32_t)
+    Caffe2Int64  -> coerce $ READ_CPU_TENSOR(blob,int64_t)
     Caffe2Unit   -> pure $ Vector.replicate size ()
   where
-    outputSize = fromIntegral $ size :: CInt
+    outputSize = fromIntegral size :: CInt
 
 #define INPUT_TENSOR(BLOB,CTYPE,VEC,SIZE,DIMS)                                    \
-    Vector.unsafeWith VEC $ \ptr -> [C.block| void {                              \
+    Vector.unsafeWith (VEC) $ \ptr -> [C.block| void {                            \
       int64_t *arrInputDims = $vec-ptr:(int64_t *DIMS);                           \
       std::vector<int64_t> shape =                                                \
         std::vector<int64_t>(arrInputDims, arrInputDims + $vec-len:DIMS);         \
@@ -178,29 +179,29 @@ writeBlob
 writeBlob dims elt vec (BlobPtr blob) =
   case elt of
     Caffe2Float ->
-      INPUT_TENSOR(blob,float,(Vector.map realToFrac vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,float,coerce vec,inputSize,inputDimsVec)
     Caffe2Double ->
-      INPUT_TENSOR(blob,double,(Vector.map realToFrac vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,double,coerce vec,inputSize,inputDimsVec)
     Caffe2Word8 ->
-      INPUT_TENSOR(blob,uint8_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,uint8_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Word16 ->
-      INPUT_TENSOR(blob,uint16_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,uint16_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Word32 -> do
        sayErr "Caffe2 doesn't support Word32"
        sayErr "inputting tensor as Int32 instead"
-       INPUT_TENSOR(blob,int32_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+       INPUT_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Word64 -> do
        sayErr "Caffe2 doesn't support Word64"
        sayErr "inputting tensor as Int64 instead"
-       INPUT_TENSOR(blob,int64_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+       INPUT_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int8 ->
-      INPUT_TENSOR(blob,int8_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,int8_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int16 ->
-      INPUT_TENSOR(blob,int16_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,int16_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int32 ->
-      INPUT_TENSOR(blob,int32_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int64 ->
-      INPUT_TENSOR(blob,int64_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Unit -> pure ()
   where
     inputSize :: CSize
@@ -209,7 +210,7 @@ writeBlob dims elt vec (BlobPtr blob) =
     inputDimsVec = Vector.fromList (fromIntegral <$> dims)
 
 #define INPUT_CPU_TENSOR(BLOB,CTYPE,VEC,SIZE,DIMS)                                       \
- Vector.unsafeWith VEC $ \ptr -> [C.block| void {                                        \
+ Vector.unsafeWith (VEC) $ \ptr -> [C.block| void {                                      \
     Blob *blob = static_cast<Blob *>($(void * BLOB));                                    \
     auto *tensor = BlobGetMutableTensor(blob, CPU);                                      \
     int64_t *arrInputDims = $vec-ptr:(int64_t *DIMS);                                    \
@@ -235,29 +236,29 @@ writeCPUBlob
 writeCPUBlob dims elt vec (BlobPtr blob) =
   case elt of
     Caffe2Float ->
-      INPUT_CPU_TENSOR(blob,float,(Vector.map realToFrac vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,float,coerce vec,inputSize,inputDimsVec)
     Caffe2Double ->
-      INPUT_CPU_TENSOR(blob,double,(Vector.map realToFrac vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,double,coerce vec,inputSize,inputDimsVec)
     Caffe2Word8 ->
-      INPUT_CPU_TENSOR(blob,uint8_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,uint8_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Word16 ->
-      INPUT_CPU_TENSOR(blob,uint16_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,uint16_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Word32 -> do
        sayErr "Caffe2 doesn't support Word32"
        sayErr "inputting tensor as Int32 instead"
-       INPUT_CPU_TENSOR(blob,int32_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+       INPUT_CPU_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Word64 -> do
        sayErr "Caffe2 doesn't support Word64"
        sayErr "inputting tensor as Int64 instead"
-       INPUT_CPU_TENSOR(blob,int64_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+       INPUT_CPU_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int8 ->
-      INPUT_CPU_TENSOR(blob,int8_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,int8_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int16 ->
-      INPUT_CPU_TENSOR(blob,int16_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,int16_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int32 ->
-      INPUT_CPU_TENSOR(blob,int32_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Int64 ->
-      INPUT_CPU_TENSOR(blob,int64_t,(Vector.map fromIntegral vec),inputSize,inputDimsVec)
+      INPUT_CPU_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
     Caffe2Unit -> pure ()
   where
     inputSize :: CInt
