@@ -45,11 +45,13 @@ initWorkspace :: IO Workspace
 #ifdef VERBOSE_LOGGING
 initWorkspace =
   Workspace <$> [C.block| void* {
-    int argc = 1;
-    static char caffe2_name[] = "caffe2-haskell";
-    char* name = &caffe2_name[0];
-    char** argv = &name;
-    caffe2::GlobalInit(&argc, &argv);
+    static char name[] = "caffe2-haskell";
+    static char logstderr[] = "--logtostderr=1";
+    static char verbosity[] = "--v=10";
+    char *argv[] = {&name[0],&logstderr[0],&verbosity[0],NULL};
+    int argc = sizeof(argv)/sizeof(char*) - 1;
+    char **args = &argv[0];
+    caffe2::GlobalInit(&argc, &args);
     Workspace *workspace = new Workspace();
     return workspace;
   } |]
