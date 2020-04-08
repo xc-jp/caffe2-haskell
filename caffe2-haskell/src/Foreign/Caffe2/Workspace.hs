@@ -4,10 +4,10 @@
 
 module Foreign.Caffe2.Workspace where
 
-import ClassyPrelude hiding (Vector)
+import           ClassyPrelude         hiding (Vector)
 
-import Foreign.Marshal.Array (peekArray)
-import Foreign.Ptr (Ptr)
+import           Foreign.Marshal.Array (peekArray)
+import           Foreign.Ptr           (Ptr)
 import qualified Language.C.Inline.Cpp as C
 
 C.context (C.cppCtx <> C.funCtx <> C.vecCtx <> C.bsCtx)
@@ -42,6 +42,18 @@ newtype NetworkPtr = NetworkPtr (Ptr ())
 -- | Initialize 'Workspace'
 
 initWorkspace :: IO Workspace
+#ifdef VERBOSE_LOGGING
+initWorkspace =
+  Workspace <$> [C.block| void* {
+    int argc = 1;
+    static char caffe2_name[] = "caffe2-haskell";
+    char* name = &caffe2_name[0];
+    char** argv = &name;
+    caffe2::GlobalInit(&argc, &argv);
+    Workspace *workspace = new Workspace();
+    return workspace;
+  } |]
+#else
 initWorkspace =
   Workspace <$> [C.block| void* {
     int argc = 0;
@@ -50,6 +62,7 @@ initWorkspace =
     Workspace *workspace = new Workspace();
     return workspace;
   } |]
+#endif
 
 -- | Free 'Workspace'
 

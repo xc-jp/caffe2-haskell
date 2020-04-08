@@ -29,6 +29,11 @@ flag use-cudnn
   manual: True
   default: False
 
+flag verbose
+  description: Run Caffe2 with verbose logging
+  manual: True
+  default: False
+
 library
   default-extensions: AutoDeriveTypeable BangPatterns BinaryLiterals ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DerivingStrategies DoAndIfThenElse EmptyDataDecls ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude OverloadedStrings PartialTypeSignatures PatternGuards PolyKinds RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeOperators TypeSynonymInstances ViewPatterns
   ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
@@ -73,6 +78,9 @@ library
     hs-source-dirs:
         cpu
 
+  if flag(verbose)
+    cpp-options:
+      -DVERBOSE_LOGGING
 
   if flag(use-cudnn)
     extra-libraries:
