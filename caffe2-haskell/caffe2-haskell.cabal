@@ -69,7 +69,7 @@ library
         cpu
 
   if flag(verbose)
-    ghc-options:
+    cpp-options:
       -DVERBOSE_LOGGING
 
 test-suite tasty
