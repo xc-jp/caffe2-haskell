@@ -19,6 +19,11 @@ flag use-gpu
   manual: True
   default: False
 
+flag use-mkl
+  description: Run Caffe2 with MKL-DNN
+  manual: True
+  default: False
+
 flag verbose
   description: Run Caffe2 with verbose logging
   manual: True
@@ -67,6 +72,10 @@ library
   if !flag(use-gpu)
     hs-source-dirs:
         cpu
+
+  if flag(use-mkl)
+    extra-libraries:
+        mkl
 
   if flag(verbose)
     cpp-options:
