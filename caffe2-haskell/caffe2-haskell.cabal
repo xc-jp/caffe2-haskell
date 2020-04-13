@@ -19,6 +19,16 @@ flag use-gpu
   manual: True
   default: False
 
+flag use-mkldnn
+  description: Link the MKL-DNN library
+  manual: True
+  default: False
+
+flag use-cudnn
+  description: Link the cuDNN library
+  manual: True
+  default: False
+
 library
   default-extensions: AutoDeriveTypeable BangPatterns BinaryLiterals ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DerivingStrategies DoAndIfThenElse EmptyDataDecls ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude OverloadedStrings PartialTypeSignatures PatternGuards PolyKinds RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeOperators TypeSynonymInstances ViewPatterns
   ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
@@ -63,6 +73,17 @@ library
     hs-source-dirs:
         cpu
 
+
+  if flag(use-cudnn)
+    extra-libraries:
+        cudnn
+
+  if flag(use-mkldnn)
+    extra-libraries:
+        mkl_intel_ilp64
+	mkl_intel_thread
+	mkl_core
+	iomp5
 
 test-suite tasty
   type: exitcode-stdio-1.0
