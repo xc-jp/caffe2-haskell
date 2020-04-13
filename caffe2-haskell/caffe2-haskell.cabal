@@ -19,12 +19,16 @@ flag use-gpu
   manual: True
   default: False
 
+flag verbose
+  description: Run Caffe2 with verbose logging
+  manual: True
+  default: False
+
 library
   default-extensions: AutoDeriveTypeable BangPatterns BinaryLiterals ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DerivingStrategies DoAndIfThenElse EmptyDataDecls ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude OverloadedStrings PartialTypeSignatures PatternGuards PolyKinds RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeOperators TypeSynonymInstances ViewPatterns
   ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
   pkgconfig-depends:
       gflags
-    , libglog
     , protobuf
   build-depends:
     base
@@ -46,6 +50,7 @@ library
     src
   extra-libraries:
     c10
+    glog
     stdc++
     torch
 
@@ -56,6 +61,7 @@ library
     hs-source-dirs:
         gpu
     extra-libraries:
+        c10_cuda
         curand
         cudart
 
@@ -63,6 +69,9 @@ library
     hs-source-dirs:
         cpu
 
+  if flag(verbose)
+    cpp-options:
+      -DVERBOSE_LOGGING
 
 test-suite tasty
   type: exitcode-stdio-1.0

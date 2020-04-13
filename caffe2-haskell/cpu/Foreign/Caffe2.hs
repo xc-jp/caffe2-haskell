@@ -45,9 +45,6 @@ C.include "<caffe2/core/net.h>"
 C.include "<caffe2/core/operator.h>"
 C.include "<caffe2/core/operator_gradient.h>"
 C.include "<caffe2/proto/caffe2.pb.h>"
-C.include "<google/protobuf/message.h>"
-C.include "<google/protobuf/message_lite.h>"
-C.include "<google/protobuf/text_format.h>"
 
 C.using "namespace caffe2"
 
