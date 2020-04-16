@@ -19,6 +19,7 @@ custom-setup
       Cabal
     , base
     , proto-lens-setup
+    , protobuf
 
 library
   exposed-modules:

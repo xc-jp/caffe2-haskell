@@ -40,7 +40,6 @@ library
   pkgconfig-depends:
       gflags
     , libglog
-    , protobuf
   build-depends:
     base
     , classy-prelude
