@@ -19,16 +19,6 @@ flag use-gpu
   manual: True
   default: False
 
-flag use-mkldnn
-  description: Link the MKL-DNN library
-  manual: True
-  default: False
-
-flag use-cudnn
-  description: Link the cuDNN library
-  manual: True
-  default: False
-
 flag verbose
   description: Run Caffe2 with verbose logging
   manual: True
@@ -39,7 +29,7 @@ library
   ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
   pkgconfig-depends:
       gflags
-    , libglog
+    , glog
     , protobuf
   build-depends:
     base
@@ -81,14 +71,6 @@ library
   if flag(verbose)
     cpp-options:
       -DVERBOSE_LOGGING
-
-  if flag(use-cudnn)
-    extra-libraries:
-        cudnn
-
-  if flag(use-mkldnn)
-    extra-libraries:
-	mkl_core
 
 test-suite tasty
   type: exitcode-stdio-1.0
