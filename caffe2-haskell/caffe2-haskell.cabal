@@ -15,6 +15,7 @@ extra-source-files:
     README.md
 pkgconfig-depends:
     gflags
+  , glog
   , protobuf
 
 flag use-gpu
@@ -49,7 +50,6 @@ library
   hs-source-dirs:
     src
   extra-libraries:
-    c10
     stdc++
     torch
 
@@ -60,10 +60,13 @@ library
     hs-source-dirs:
         gpu
     extra-libraries:
+        c10_cuda
         curand
         cudart
 
   if !flag(use-gpu)
+    extra-libraries:
+        c10
     hs-source-dirs:
         cpu
 
