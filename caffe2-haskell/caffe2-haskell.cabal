@@ -49,6 +49,7 @@ library
   hs-source-dirs:
     src
   extra-libraries:
+    glog
     stdc++
     torch
 
