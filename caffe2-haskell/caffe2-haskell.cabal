@@ -49,6 +49,7 @@ library
   hs-source-dirs:
     src
   extra-libraries:
+    c10
     glog
     stdc++
     torch
@@ -65,8 +66,6 @@ library
         cudart
 
   if !flag(use-gpu)
-    extra-libraries:
-        c10
     hs-source-dirs:
         cpu
 
