@@ -4,10 +4,10 @@
 
 module Foreign.Caffe2.Workspace where
 
-import ClassyPrelude hiding (Vector)
+import           ClassyPrelude         hiding (Vector)
 
-import Foreign.Marshal.Array (peekArray)
-import Foreign.Ptr (Ptr)
+import           Foreign.Marshal.Array (peekArray)
+import           Foreign.Ptr           (Ptr)
 import qualified Language.C.Inline.Cpp as C
 
 C.context (C.cppCtx <> C.funCtx <> C.vecCtx <> C.bsCtx)
@@ -18,9 +18,7 @@ C.include "<caffe2/core/net.h>"
 C.include "<caffe2/core/operator.h>"
 C.include "<caffe2/core/operator_gradient.h>"
 C.include "<caffe2/proto/caffe2.pb.h>"
-C.include "<google/protobuf/message.h>"
-C.include "<google/protobuf/message_lite.h>"
-C.include "<google/protobuf/text_format.h>"
+C.include "<caffe2/utils/proto_utils.h>"
 
 C.using "namespace caffe2"
 
@@ -42,6 +40,20 @@ newtype NetworkPtr = NetworkPtr (Ptr ())
 -- | Initialize 'Workspace'
 
 initWorkspace :: IO Workspace
+#ifdef VERBOSE_LOGGING
+initWorkspace =
+  Workspace <$> [C.block| void* {
+    static char name[] = "caffe2-haskell";
+    static char logstderr[] = "--logtostderr=1";
+    static char verbosity[] = "--v=10";
+    char *argv[] = {&name[0],&logstderr[0],&verbosity[0],NULL};
+    int argc = sizeof(argv)/sizeof(char*) - 1;
+    char **args = &argv[0];
+    caffe2::GlobalInit(&argc, &args);
+    Workspace *workspace = new Workspace();
+    return workspace;
+  } |]
+#else
 initWorkspace =
   Workspace <$> [C.block| void* {
     int argc = 0;
@@ -50,6 +62,7 @@ initWorkspace =
     Workspace *workspace = new Workspace();
     return workspace;
   } |]
+#endif
 
 -- | Free 'Workspace'
 
