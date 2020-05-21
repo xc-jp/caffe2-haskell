@@ -44,6 +44,7 @@ C.include "<caffe2/core/init.h>"
 C.include "<caffe2/core/net.h>"
 C.include "<caffe2/core/operator.h>"
 C.include "<caffe2/core/operator_gradient.h>"
+C.include "<caffe2/ideep/ideep_utils.h>"
 C.include "<caffe2/proto/caffe2.pb.h>"
 
 C.using "namespace caffe2"
@@ -52,6 +53,7 @@ C.using "namespace caffe2"
 #define READ_TENSOR(BLOB,CTYPE,NAME)                                                     \
   Mutable.new (fromIntegral outputSize) >>= \vec ->                                      \
   [C.block| void {                                                                       \
+    printf("Reading blob CTYPE NAME ... \n");                                            \
     Blob *blob = static_cast<Blob *>($(void *BLOB));                                     \
     const TensorCPU &outTensor = blob->Get<TensorCPU>();                                 \
                                                                                          \
@@ -99,17 +101,18 @@ readCPUBlob = readBlob
 #define WRITE_TENSOR(BLOB,CTYPE,VEC,SIZE,DIMS)                                           \
  Vector.unsafeWith (VEC) $ \ptr -> [C.block| void {                                      \
     Blob *blob = static_cast<Blob *>($(void *BLOB));                                     \
-    int64_t *arrInputDims = $vec-ptr:(int64_t *DIMS);                                    \
-    std::vector<int64_t> shape =                                                         \
-      std::vector<int64_t>(arrInputDims, arrInputDims + $vec-len:DIMS);                  \
-    auto *tensor = BlobGetMutableTensor(blob, CPU);                                      \
-    tensor->Resize(shape);                                                               \
+    int *arrInputDims = $vec-ptr:(int *DIMS);                                    \
+    std::vector<int> shape =                                                         \
+      std::vector<int>(arrInputDims, arrInputDims + $vec-len:DIMS);                  \
+    auto *tensor = blob->GetMutable<ideep::tensor>();                                    \
+    tensor->resize(shape, ideep::tensor::data_type::f32);                                                               \
     CTYPE *inputVec = $(CTYPE *ptr);                                                     \
-    CTYPE *tensorData = tensor->mutable_data<CTYPE>();                                   \
-    int tensorSize = $(int SIZE);                                                        \
-    for (int i = 0; i < tensorSize; i ++) {                                              \
-      tensorData[i] = inputVec[i];                                                       \
-    }                                                                                    \
+    // CTYPE *tensorData = tensor->mutable_data<CTYPE>();                                   \
+    // int tensorSize = $(int SIZE);                                                        \
+    // for (int i = 0; i < tensorSize; i ++) {                                              \
+    //   tensorData[i] = inputVec[i];                                                       \
+    // }                                                                                    \
+    tensor->feed_from(shape, ideep::tensor::data_type::f32, inputVec);                                           \
   }|]
 
 -- | Write tensor data to a blob
@@ -124,33 +127,49 @@ writeBlob dims elt vec (BlobPtr blob) =
   case elt of
     Caffe2Float ->
       WRITE_TENSOR(blob,float,coerce vec,inputSize,inputDimsVec)
-    Caffe2Double ->
-      WRITE_TENSOR(blob,double,coerce vec,inputSize,inputDimsVec)
-    Caffe2Word8 ->
-      WRITE_TENSOR(blob,uint8_t,coerce vec,inputSize,inputDimsVec)
-    Caffe2Word16 ->
-      WRITE_TENSOR(blob,uint16_t,coerce vec,inputSize,inputDimsVec)
+    Caffe2Double -> do
+      sayErr "ideep doesn't support Double"
+      -- WRITE_TENSOR(blob,double,coerce vec,inputSize,inputDimsVec)
+      pure ()
+    Caffe2Word8 -> do
+      sayErr "ideep doesn't support Double"
+      -- WRITE_TENSOR(blob,uint8_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
+    Caffe2Word16 -> do
+      sayErr "ideep doesn't support Double"
+      -- WRITE_TENSOR(blob,uint16_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
     Caffe2Word32 -> do
-       sayErr "Caffe2 doesn't support Word32"
-       sayErr "inputting tensor as Int32 instead"
-       WRITE_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
+      sayErr "Caffe2 doesn't support Word32"
+      sayErr "inputting tensor as Int32 instead"
+       -- WRITE_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
     Caffe2Word64 -> do
-       sayErr "Caffe2 doesn't support Word64"
-       sayErr "inputting tensor as Int64 instead"
-       WRITE_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
-    Caffe2Int8 ->
-      WRITE_TENSOR(blob,int8_t,coerce vec,inputSize,inputDimsVec)
-    Caffe2Int16 ->
-      WRITE_TENSOR(blob,int16_t,coerce vec,inputSize,inputDimsVec)
-    Caffe2Int32 ->
-      WRITE_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
-    Caffe2Int64 ->
-      WRITE_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
+      sayErr "Caffe2 doesn't support Word64"
+      sayErr "inputting tensor as Int64 instead"
+       -- WRITE_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
+    Caffe2Int8 -> do
+      sayErr "ideep doesn't support Double"
+      -- WRITE_TENSOR(blob,int8_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
+    Caffe2Int16 -> do
+      sayErr "ideep doesn't support Double"
+      -- WRITE_TENSOR(blob,int16_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
+    Caffe2Int32 -> do
+      sayErr "ideep doesn't support Double"
+      -- WRITE_TENSOR(blob,int32_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
+    Caffe2Int64 -> do
+      sayErr "ideep doesn't support Double"
+      -- WRITE_TENSOR(blob,int64_t,coerce vec,inputSize,inputDimsVec)
+      pure ()
     Caffe2Unit -> pure ()
   where
     inputSize :: CInt
     inputSize = fromIntegral $ product dims
-    inputDimsVec :: Vector.Vector Int64
+    inputDimsVec :: Vector.Vector CInt
     inputDimsVec = Vector.fromList (fromIntegral <$> dims)
 
 -- | Write tensor data to a blob stored on the CPU

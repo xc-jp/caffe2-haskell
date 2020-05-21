@@ -17,6 +17,7 @@ C.include "<caffe2/core/init.h>"
 C.include "<caffe2/core/net.h>"
 C.include "<caffe2/core/operator.h>"
 C.include "<caffe2/core/operator_gradient.h>"
+C.include "<caffe2/ideep/ideep_utils.h>"
 C.include "<caffe2/proto/caffe2.pb.h>"
 C.include "<caffe2/utils/proto_utils.h>"
 
@@ -126,11 +127,11 @@ getShape :: BlobPtr -> IO [Int]
 getShape (BlobPtr blob) = do
   len <- [C.block| size_t {
       Blob * blob = static_cast<Blob *>($(void * blob));
-      return blob->Get<Tensor>().dim();
+      return blob->Get<ideep::tensor>().ndims();
   }|]
-  ptr <- [C.block| const int64_t* {
+  ptr <- [C.block| const int* {
       Blob * blob = static_cast<Blob *>($(void * blob));
-      return blob->Get<Tensor>().sizes().data();
+      return blob->Get<ideep::tensor>().get_dims().data();
   } |]
   cs <- peekArray (fromIntegral len) ptr
   pure (fromIntegral <$> cs)
