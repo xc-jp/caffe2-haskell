@@ -19,7 +19,6 @@ custom-setup
       Cabal
     , base
     , proto-lens-setup
-    , protobuf
 
 library
   exposed-modules:
@@ -31,7 +30,7 @@ library
       Paths_caffe2_proto
       Proto.Caffe2
       Proto.Caffe2_Fields
-  ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
+  ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
   build-depends:
       base >=4.7 && <5
     , proto-lens-runtime
