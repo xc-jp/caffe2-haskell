@@ -53,6 +53,8 @@ library
     glog
     stdc++
     torch
+    -- Contrary to naming, needed also for GPU
+    torch_cpu
 
   if os(darwin)
     ghc-options: -optc-std=c++11
@@ -62,6 +64,7 @@ library
         gpu
     extra-libraries:
         c10_cuda
+        torch_cuda
         curand
         cudart
 
