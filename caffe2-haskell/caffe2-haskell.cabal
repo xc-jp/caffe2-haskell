@@ -1,101 +1,186 @@
-cabal-version: 1.12
-
-name:           caffe2-haskell
-version:        0.1.0.0
-category:       Machine Learning
-homepage:       https://github.com/xc-jp/greenia#readme
-author:         Cross Compass, Ltd.
-maintainer:     ix-dev@cross-compass.com
-copyright:      © 2018 Cross Compass, Ltd.
-license:        BSD3
-license-file:   LICENSE
-build-type:     Simple
+cabal-version:      1.12
+name:               caffe2-haskell
+version:            0.1.0.0
+category:           Machine Learning
+homepage:           https://github.com/xc-jp/greenia#readme
+author:             Cross Compass, Ltd.
+maintainer:         ix-dev@cross-compass.com
+copyright:          © 2018 Cross Compass, Ltd.
+license:            BSD3
+license-file:       LICENSE
+build-type:         Simple
 extra-source-files:
-    CHANGELOG.md
-    README.md
+  CHANGELOG.md
+  README.md
 
 flag use-gpu
   description: Run Caffe2 computations on the GPU
-  manual: True
-  default: False
+  manual:      True
+  default:     False
 
 flag verbose
   description: Run Caffe2 with verbose logging
-  manual: True
-  default: False
+  manual:      True
+  default:     False
 
 library
-  default-extensions: AutoDeriveTypeable BangPatterns BinaryLiterals ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DerivingStrategies DoAndIfThenElse EmptyDataDecls ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude OverloadedStrings PartialTypeSignatures PatternGuards PolyKinds RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeOperators TypeSynonymInstances ViewPatterns
-  ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
-  pkgconfig-depends:
-      gflags
-    , protobuf
+  default-extensions:
+    NoImplicitPrelude
+    AutoDeriveTypeable
+    BangPatterns
+    BinaryLiterals
+    ConstraintKinds
+    DataKinds
+    DefaultSignatures
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveTraversable
+    DerivingStrategies
+    DoAndIfThenElse
+    EmptyDataDecls
+    ExistentialQuantification
+    FlexibleContexts
+    FlexibleInstances
+    FunctionalDependencies
+    GADTs
+    GeneralizedNewtypeDeriving
+    InstanceSigs
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    NamedFieldPuns
+    OverloadedStrings
+    PartialTypeSignatures
+    PatternGuards
+    PolyKinds
+    RankNTypes
+    RecordWildCards
+    ScopedTypeVariables
+    StandaloneDeriving
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    TypeSynonymInstances
+    ViewPatterns
+
+  ghc-options:
+    -Wall -Wcompat -Werror -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+    -Wnoncanonical-monadfail-instances
+
+  pkgconfig-depends:  gflags -any, protobuf -any
   build-depends:
-    base
+      base
     , classy-prelude
     , inline-c
     , inline-c-cpp
     , template-haskell
     , vector
+
   exposed-modules:
     Foreign.Caffe2
     Foreign.Caffe2.Caffe2Elt
+
   other-modules:
     Foreign.Caffe2.Workspace
     Paths_caffe2_haskell
-  autogen-modules:
-    Paths_caffe2_haskell
-  default-language: Haskell2010
-  hs-source-dirs:
-    src
+
+  autogen-modules:    Paths_caffe2_haskell
+  default-language:   Haskell2010
+  hs-source-dirs:     src
   extra-libraries:
     c10
     glog
     stdc++
     torch
-    -- Contrary to naming, needed also for GPU
     torch_cpu
 
-  if os(darwin)
-    ghc-options: -optc-std=c++11
+  ghc-options:        -Wall -optc-xc++ -optc-std=c++14
 
   if flag(use-gpu)
-    hs-source-dirs:
-        gpu
+    hs-source-dirs:  gpu
     extra-libraries:
-        c10_cuda
-        torch_cuda
-        curand
-        cudart
+      c10_cuda
+      torch_cuda
+      curand
+      cudart
 
   if !flag(use-gpu)
-    hs-source-dirs:
-        cpu
+    hs-source-dirs: cpu
 
   if flag(verbose)
-    cpp-options:
-      -DVERBOSE_LOGGING
+    cpp-options: -DVERBOSE_LOGGING
 
 test-suite tasty
-  type: exitcode-stdio-1.0
-  main-is: tasty.hs
+  type:               exitcode-stdio-1.0
+  main-is:            tasty.hs
   other-modules:
-      Foreign.Caffe2Test
-      Paths_caffe2_haskell
-  autogen-modules:
-      Paths_caffe2_haskell
-  hs-source-dirs:
-      test/tasty
-  default-extensions: AutoDeriveTypeable BangPatterns BinaryLiterals ConstraintKinds DataKinds DefaultSignatures DeriveDataTypeable DeriveFoldable DeriveFunctor DeriveGeneric DeriveTraversable DerivingStrategies DoAndIfThenElse EmptyDataDecls ExistentialQuantification FlexibleContexts FlexibleInstances FunctionalDependencies GADTs GeneralizedNewtypeDeriving InstanceSigs KindSignatures LambdaCase MultiParamTypeClasses MultiWayIf NamedFieldPuns NoImplicitPrelude OverloadedStrings PartialTypeSignatures PatternGuards PolyKinds RankNTypes RecordWildCards ScopedTypeVariables StandaloneDeriving TupleSections TypeApplications TypeFamilies TypeOperators TypeSynonymInstances ViewPatterns
-  ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances -Wno-missing-signatures
+    Foreign.Caffe2Test
+    Paths_caffe2_haskell
+
+  autogen-modules:    Paths_caffe2_haskell
+  hs-source-dirs:     test/tasty
+  default-extensions:
+    NoImplicitPrelude
+    AutoDeriveTypeable
+    BangPatterns
+    BinaryLiterals
+    ConstraintKinds
+    DataKinds
+    DefaultSignatures
+    DeriveDataTypeable
+    DeriveFoldable
+    DeriveFunctor
+    DeriveGeneric
+    DeriveTraversable
+    DerivingStrategies
+    DoAndIfThenElse
+    EmptyDataDecls
+    ExistentialQuantification
+    FlexibleContexts
+    FlexibleInstances
+    FunctionalDependencies
+    GADTs
+    GeneralizedNewtypeDeriving
+    InstanceSigs
+    KindSignatures
+    LambdaCase
+    MultiParamTypeClasses
+    MultiWayIf
+    NamedFieldPuns
+    OverloadedStrings
+    PartialTypeSignatures
+    PatternGuards
+    PolyKinds
+    RankNTypes
+    RecordWildCards
+    ScopedTypeVariables
+    StandaloneDeriving
+    TupleSections
+    TypeApplications
+    TypeFamilies
+    TypeOperators
+    TypeSynonymInstances
+    ViewPatterns
+
+  ghc-options:
+    -Wall -Wcompat -Werror -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+    -Wnoncanonical-monadfail-instances -Wno-missing-signatures
+
   build-depends:
-      QuickCheck
-    , base
-    , classy-prelude
+      base
     , caffe2-haskell
+    , classy-prelude
+    , QuickCheck
     , tasty
     , tasty-hunit
     , tasty-quickcheck
     , template-haskell
     , vector
-  default-language: Haskell2010
+
+  default-language:   Haskell2010
