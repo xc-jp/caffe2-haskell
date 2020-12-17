@@ -170,7 +170,7 @@ test-suite tasty
   ghc-options:
     -Wall -Wcompat -Werror -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-    -Wnoncanonical-monadfail-instances -Wno-missing-signatures
+    -Wno-missing-signatures
 
   build-depends:
       base
