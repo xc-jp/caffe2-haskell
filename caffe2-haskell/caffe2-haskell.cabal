@@ -70,7 +70,6 @@ library
   ghc-options:
     -Wall -Wcompat -Werror -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-    -Wnoncanonical-monadfail-instances
 
   pkgconfig-depends:  gflags -any, protobuf -any
   build-depends:
