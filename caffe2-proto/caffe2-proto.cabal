@@ -1,38 +1,42 @@
-cabal-version: 2.0
-
-name:           caffe2-proto
-version:        0.1.0.0
-category:       Machine Learning
-homepage:       https://github.com/xc-jp/greenia#readme
-author:         Cross Compass, Ltd.
-maintainer:     ix-dev@cross-compass.com
-copyright:      © 2018 Cross Compass, Ltd.
-license:        BSD3
-license-file:   LICENSE
-build-type:     Custom
+cabal-version:      2.0
+name:               caffe2-proto
+version:            0.1.0.0
+category:           Machine Learning
+homepage:           https://github.com/xc-jp/greenia#readme
+author:             Cross Compass, Ltd.
+maintainer:         ix-dev@cross-compass.com
+copyright:          © 2018 Cross Compass, Ltd.
+license:            BSD3
+license-file:       LICENSE
+build-type:         Custom
 extra-source-files:
-    CHANGELOG.md
-    proto/caffe2.proto
+  CHANGELOG.md
+  proto/caffe2.proto
 
 custom-setup
   setup-depends:
-      Cabal
-    , base
+      base
+    , Cabal
     , proto-lens-setup
     , protobuf
 
 library
   exposed-modules:
-      Proto.Caffe2
-      Proto.Caffe2_Fields
-  other-modules:
-      Paths_caffe2_proto
+    Proto.Caffe2
+    Proto.Caffe2_Fields
+
+  other-modules:    Paths_caffe2_proto
   autogen-modules:
-      Paths_caffe2_proto
-      Proto.Caffe2
-      Proto.Caffe2_Fields
-  ghc-options: -Wall -Wcompat -Werror -Wincomplete-record-updates -Wincomplete-uni-patterns -Wnoncanonical-monad-instances -Wnoncanonical-monadfail-instances
+    Paths_caffe2_proto
+    Proto.Caffe2
+    Proto.Caffe2_Fields
+
+  ghc-options:
+    -Wall -Wcompat -Werror -Wincomplete-record-updates
+    -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
+
   build-depends:
-      base >=4.7 && <5
+      base                >=4.7 && <5
     , proto-lens-runtime
+
   default-language: Haskell2010

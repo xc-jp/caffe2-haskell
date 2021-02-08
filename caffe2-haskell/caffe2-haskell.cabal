@@ -25,8 +25,6 @@ flag verbose
 
 library
   default-extensions:
-    NoImplicitPrelude
-    AutoDeriveTypeable
     BangPatterns
     BinaryLiterals
     ConstraintKinds
@@ -52,6 +50,7 @@ library
     MultiParamTypeClasses
     MultiWayIf
     NamedFieldPuns
+    NoImplicitPrelude
     OverloadedStrings
     PartialTypeSignatures
     PatternGuards
@@ -70,7 +69,6 @@ library
   ghc-options:
     -Wall -Wcompat -Werror -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-    -Wnoncanonical-monadfail-instances
 
   pkgconfig-depends:  gflags -any, protobuf -any
   build-depends:
@@ -126,7 +124,6 @@ test-suite tasty
   hs-source-dirs:     test/tasty
   default-extensions:
     NoImplicitPrelude
-    AutoDeriveTypeable
     BangPatterns
     BinaryLiterals
     ConstraintKinds
@@ -170,7 +167,7 @@ test-suite tasty
   ghc-options:
     -Wall -Wcompat -Werror -Wincomplete-record-updates
     -Wincomplete-uni-patterns -Wnoncanonical-monad-instances
-    -Wnoncanonical-monadfail-instances -Wno-missing-signatures
+    -Wno-missing-signatures
 
   build-depends:
       base
